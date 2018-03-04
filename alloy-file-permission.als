@@ -2,13 +2,13 @@ module FilePermissions
 
 -- *** Signatures *** 
 
--- Permission Denifiotin
+-- Permission Denifinition
 abstract sig Permission {
-	priority: Int
+	private priority: Int
 }
 
 one sig Read extends Permission {} {
-	priority = 1
+	priority = 1 
 }
 
 one sig ReadWrite extends Permission {} {
@@ -70,7 +70,6 @@ fact TreeStructure {
 	-- files must be content of exactly one direct directory
 	all file : File | one file.~content
 	
-	-- This is just a test
 	all directory : Directory | validContentPermissions[directory]
 }
 --
