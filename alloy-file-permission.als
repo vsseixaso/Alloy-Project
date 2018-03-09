@@ -101,13 +101,27 @@ Test if properties of tree are being fullfilled by all the entities.
 */
 assert checkTree {
 	one dir : Directory | isRoot[dir] and no parent[dir]
-	
+
 	all dir : Directory | not dir in dir.content
 
 	all path : Path | #(parent[path]) = 1 or isRoot[path]
 }
 
+assert checkAllPathsHasPermissions{
+	all path : Path | #(path.forAllPermission) = 1
+	all path : Path | #(path.externalPermission) = 1
+	all path : Path | #(path.thisComputerPermission) = 1
+}
+
+assert checkPermissionsValidity{
+	all path : Path | no parent[path] or validInheritancePermissons[parent[path], path]
+}
+
 check checkTree
+
+check checkAllPathsHasPermissions
+
+check checkPermissionsValidity
 
 -- *** Execution ***
 pred show[] {}
