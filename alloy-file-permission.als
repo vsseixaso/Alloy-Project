@@ -34,9 +34,28 @@ sig Directory extends Path {
 sig File extends Path {}
 --
 
-fun parent [ent:Path]: Directory {
-	ent.~content
+--- *** Functions *** ---
+
+fun parent [path : Path] : Directory {
+	path.~content
 }
+
+fun getForAllPermission [path : Path] : Permission {
+	path.forAllPermission
+}
+
+fun getExternalPermission [path : Path] : Permission {
+	path.externalPermission
+}
+
+fun getThisComputerPermission [path : Path] : Permission {
+	path.thisComputerPermission
+}
+
+fun getPriority [permission : Permission] : Int {
+	permission.priority
+}
+---
 
 -- *** Predicates ***
 
@@ -45,13 +64,13 @@ pred isRoot[directory : Directory] {
 }
 
 pred validComparison[parentPermission : Permission, childPermission : Permission] {
-	parentPermission.priority >= childPermission.priority
+	getPriority[parentPermission] >= getPriority[childPermission]
 }
 
 pred validInheritancePermissons[parent : Path, child : Path] {
-	validComparison[parent.forAllPermission, child.forAllPermission] and
-	validComparison[parent.externalPermission, child.externalPermission] and
-	validComparison[parent.thisComputerPermission, child.thisComputerPermission]
+	validComparison[getForAllPermission[parent], getForAllPermission[child]] and
+	validComparison[getExternalPermission[parent], getExternalPermission[child]] and
+	validComparison[getThisComputerPermission[parent], getThisComputerPermission[child]]
 }
 
 pred validContentPermissions[parent : Directory] {
@@ -68,12 +87,12 @@ fact TreeStructure {
 	-- there must be no cyclic relation between directories
 	no directory : Directory | directory in directory.^content
 	
-	-- directories must be content of none or exaclty one directory
+	-- directories must be content of none or exactly one directory
 	all directory : Directory | lone directory.~content
 
 	-- files must be content of exactly one direct directory
 	all file : File | one file.~content
-	
+
 	all directory : Directory | validContentPermissions[directory]
 }
 --
@@ -81,11 +100,11 @@ fact TreeStructure {
 Test if properties of tree are being fullfilled by all the entities.
 */
 assert checkTree {
-	one dir: Directory | isRoot[dir] and no parent[dir]
+	one dir : Directory | isRoot[dir] and no parent[dir]
 	
-	all dir :Directory | not dir in dir.content
+	all dir : Directory | not dir in dir.content
 
-	all path: Path | #(parent[path]) = 1 or isRoot[path]
+	all path : Path | #(parent[path]) = 1 or isRoot[path]
 }
 
 check checkTree
