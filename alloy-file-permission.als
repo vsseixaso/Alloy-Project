@@ -34,6 +34,10 @@ sig Directory extends Path {
 sig File extends Path {}
 --
 
+fun parent [ent:Path]: Directory {
+	ent.~content
+}
+
 -- *** Predicates ***
 
 pred isRoot[directory : Directory] {
@@ -73,6 +77,18 @@ fact TreeStructure {
 	all directory : Directory | validContentPermissions[directory]
 }
 --
+/*
+Test if properties of tree are being fullfilled by all the entities.
+*/
+assert checkTree {
+	one dir: Directory | isRoot[dir] and no parent[dir]
+	
+	all dir :Directory | not dir in dir.content
+
+	all path: Path | #(parent[path]) = 1 or isRoot[path]
+}
+
+check checkTree
 
 -- *** Execution ***
 pred show[] {}
