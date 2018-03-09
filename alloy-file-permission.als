@@ -109,11 +109,15 @@ assert checkTree {
 
 assert checkAllPathsHasPermissions{
 	all path : Path | #(path.forAllPermission) = 1
+	
 	all path : Path | #(path.externalPermission) = 1
+	
 	all path : Path | #(path.thisComputerPermission) = 1
 }
 
 assert checkPermissionsValidity{
+	all directory : Directory | validContentPermissions[directory]
+
 	all path : Path | no parent[path] or validInheritancePermissons[parent[path], path]
 }
 
